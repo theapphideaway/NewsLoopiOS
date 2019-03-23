@@ -12,10 +12,7 @@ class SearchViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
     }
-
-    // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
@@ -26,6 +23,4 @@ class SearchViewController: UITableViewController {
         // #warning Incomplete implementation, return the number of rows
         return 0
     }
-
-
 }
