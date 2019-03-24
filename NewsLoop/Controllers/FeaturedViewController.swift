@@ -7,22 +7,21 @@
 //
 
 import UIKit
+import Kingfisher
 
 class FeaturedViewController: UITableViewController {
 
     static let newsService = NewsService()
     var newsResponse = NewsResponse()
     
-    var photos = Photos()
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        FeaturedViewController.newsService.getTestAPI{
-            (articles, photos) in
+        FeaturedViewController.newsService.getCategories(category: "general"){
+            (articles) in
             self.newsResponse = articles
-            self.photos = photos
             self.tableView.reloadData()
         }
     }
@@ -36,9 +35,18 @@ class FeaturedViewController: UITableViewController {
         cell.articleTitle.text = newsResponse.articles[indexPath.row].title
         
         print(indexPath.row)
-        print(photos.thumbnails.count)
         print(newsResponse.articles.count)
-        cell.articleImage.image = photos.thumbnails[indexPath.row]
+        
+        let url = newsResponse.articles[indexPath.row].urlToImage ?? AppConstants.defaultImage
+        
+        guard let escapedUrl = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
+            return cell
+        }
+        
+        let photoUrl = URL(string: escapedUrl)
+        
+        cell.articleImage.kf.setImage(with: photoUrl)
+        
         cell.articleImage.layer.cornerRadius = 5;
         cell.articleImage.layer.masksToBounds = true;
         
@@ -46,6 +54,28 @@ class FeaturedViewController: UITableViewController {
         cell.articleDate.text = newsResponse.articles[indexPath.row].publishedAt
         
         return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        self.performSegue(withIdentifier: "FeaturedArticleSegue", sender: self)
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "FeaturedArticleSegue"{
+            let controller = (segue.destination) as! FeaturedWebController
+        let indexPath = tableView.indexPathForSelectedRow
+        controller.articleUrl = newsResponse.articles[indexPath!.row].url
+        }
+    }
+    
+}
+
+extension FeaturedViewController{
+    func prepareStringForUrl(url: String) -> URL{
+        let escapedUrl = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
+        let preparedUrl = URL(string: escapedUrl!)
+        return preparedUrl!
     }
 }
 

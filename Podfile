@@ -6,5 +6,6 @@ target 'NewsLoop' do
   use_frameworks!
 
   pod 'Alamofire'
+  pod 'Kingfisher'
 
 end
